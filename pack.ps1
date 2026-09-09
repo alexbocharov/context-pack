@@ -25,8 +25,9 @@ $AllowedExtensions = @(
     ".go", ".rs", ".c", ".cpp", ".h", ".hpp",
     # Java / Kotlin / Scala
     ".java", ".kt", ".scala", ".gradle",
-    # DevOps / Cloud / Container / Config
+    # DevOps / Cloud / Containers / Pipelines / Shell Scripts
     ".yaml", ".yml", ".tf", ".dockerfile", "dockerfile", ".ini", ".env", ".example",
+    ".ps1", ".sh", ".bat", ".bash", ".cmd",
     # Documentation & Data
     ".md", ".txt", ".sql", ".graphql", ".proto"
 )
@@ -105,8 +106,8 @@ if ($Format -eq 'docx') {
     $Selection.InsertBreak(7) # 7 is the integer value for wdPageBreak, works everywhere
 
     foreach ($File in $Files) {
-        # Skip output file if running repeatedly
-        if ($File.FullName -eq $OutputPath) { continue } 
+        # Skip the runner script itself and ANY previously generated results
+        if ($File.Name -eq "pack.ps1" -or $File.Name -like "Repository_Source_Code.*") { continue } 
         
         $RelativePath = $File.FullName.Substring($RepoRoot.Length + 1)
         Write-Host "Processing ($(($Count+1))): $RelativePath" -ForegroundColor Yellow
@@ -163,7 +164,9 @@ ROOT PATH: $RepoRoot
     Add-Content -Path $OutputPath -Value $Header -Encoding UTF8
 
     foreach ($File in $Files) {
-        if ($File.FullName -eq $OutputPath) { continue }
+        # Skip the runner script itself and ANY previously generated results
+        if ($File.Name -eq "pack.ps1" -or $File.Name -like "Repository_Source_Code.*") { continue }
+        
         $RelativePath = $File.FullName.Substring($RepoRoot.Length + 1)
         Write-Host "Processing ($(($Count+1))): $RelativePath" -ForegroundColor Yellow
         
